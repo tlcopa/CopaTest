@@ -1,0 +1,119 @@
+<apex:page id="CCD_CreateQualityGate" standardController="copado__Quality_Gate__c" extensions="copado.CCD_CreateQualityGateExtension" lightningStylesheets="true" standardStylesheets="false" applyBodyTag="true" showHeader="true" docType="html-5.0">
+    <apex:slds />
+    <style>
+    .slds-form-element {
+    padding: .5em .5em;
+    }
+    </style>
+    <div class="slds-scope">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                      <span class="slds-icon_container slds-icon-custom-custom67">
+                        <svg class="slds-icon" aria-hidden="true">
+                          <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                               xlink:href="{!URLFOR($Resource.SLDS,'/assets/icons/custom-sprite/svg/symbols.svg#custom67')}"></use>
+                        </svg>
+                      </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <p class="slds-text-heading--label slds-line-height--reset">{!$ObjectType.Quality_Gate__c.Label}</p>
+                            <h1 class="slds-page-header__title slds-truncate slds-align-middle"
+                                title="{!$Label.NEW} {!$ObjectType.Quality_Gate__c.Label}">
+                                {!$Label.NEW} {!$ObjectType.Quality_Gate__c.Label}
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <apex:form id="groupItemForm">
+            <apex:pageBlock >
+                <apex:PageMessages id="messages"/>
+                <c:CopadoSpinner />
+                <apex:pageBlockSection columns="3">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.copado__Quality_Gate__c.Fields.Name.Label}"/>
+                        <apex:outputPanel layout="block" styleClass="requiredInput">
+                            <div class="requiredBlock"/>
+                            <apex:inputField value="{!thisQualityGate.Name}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.copado__Quality_Gate__c.Fields.copado__Type__c.Label}"/>
+                        <apex:outputPanel layout="block" styleClass="requiredInput">
+                            <div class="requiredBlock"/>
+                            <apex:selectList size="1" multiSelect="false" value="{!thisQualityGate.copado__Type__c}"
+                                             onChange="toggleAdditionalFields(this.value);" required="true">
+                                <apex:selectOptions value="{!typeOptions}"/>
+                            </apex:selectList>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.copado__Quality_Gate__c.Fields.copado__Metadata_Group__c.Label}" styleClass="metadataGroupInput"/>
+                        <apex:outputPanel layout="block" styleClass="metadataGroupInputContainer metadataGroupInput">
+                            <div class="requiredBlock"/>
+                            <apex:inputField value="{!thisQualityGate.copado__Metadata_Group__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.copado__Quality_Gate__c.Fields.copado__Selenium_Test_Group__c.Label}" styleClass="seleniumInput" style="visibility: hidden;"/>
+                        <apex:outputPanel layout="block" styleClass="SeleniumGroupInputContainer seleniumInput" style="visibility: hidden;">
+                            <div class="requiredBlock"/>
+                            <apex:inputField value="{!thisQualityGate.copado__Selenium_Test_Group__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.copado__Quality_Gate__c.Fields.copado__Test_Level__c.Label}" styleClass="testLevelInput"/>
+                        <apex:outputPanel layout="block" styleClass="requiredInput testLevelInput">
+                            <div class="requiredBlock"/>
+                            <apex:selectList size="1" multiSelect="false" value="{!thisQualityGate.copado__Test_Level__c}" required="true">
+                                <apex:selectOptions value="{!testLevelOptions}"/>
+                            </apex:selectList>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.copado__Quality_Gate__c.Fields.copado__Static_Code_Analysis_Settings__c.Label}" styleClass="staticAnalysisInput" style="visibility: hidden;"/>
+                        <apex:inputField value="{!thisQualityGate.copado__Static_Code_Analysis_Settings__c}" styleClass="staticAnalysisInput" style="visibility: hidden;"/>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                <div class="slds-form-element">
+                    <apex:commandButton value="{!$Label.copado__save}" action="{!save}" styleClass="slds-button slds-button_brand"
+                                        onClick="lockScreen();" onComplete="unlockScreen();" reRender="messages"/>
+                </div>
+            </apex:pageBlock>
+        </apex:form>
+    </div>
+    <script> 
+    function toggleAdditionalFields(selectedValue) {
+        var testLevelInput = document.querySelectorAll('.testLevelInput');
+        for(var i = 0; i < testLevelInput.length; i++) {
+            testLevelInput[i].style.visibility = selectedValue == '{!APEX_TEST}' ? 'visible' : 'hidden';
+        }
+        var staticAnalysisInput = document.querySelectorAll('.staticAnalysisInput');
+        for(var i = 0; i < staticAnalysisInput.length; i++) {
+            staticAnalysisInput[i].style.visibility = selectedValue == '{!STATIC_ANALYSIS}' ? 'visible' : 'hidden';
+        }
+        var seleniumInput = document.querySelectorAll('.seleniumInput');
+        for(var i = 0; i < seleniumInput.length; i++) {
+            seleniumInput[i].style.visibility = selectedValue == '{!SELENIUM_TEST}' ? 'visible' : 'hidden';
+        }
+        var metadataGroupInput = document.querySelectorAll('.metadataGroupInput');
+        for(var i = 0; i < metadataGroupInput.length; i++) {
+            metadataGroupInput[i].style.visibility = selectedValue != '{!COMPLIANCE}' ? 'visible' : 'hidden';
+        }
+        var metadataGroupInputContainer = document.querySelector('.metadataGroupInputContainer');
+        var SeleniumGroupInputContainer = document.querySelector('.SeleniumGroupInputContainer');
+        metadataGroupInputContainer.className = 'metadataGroupInputContainer metadataGroupInput';
+        SeleniumGroupInputContainer.className = 'SeleniumGroupInputContainer seleniumInput';
+        if(selectedValue == '{!SELENIUM_TEST}' || selectedValue == '{!STATIC_ANALYSIS}') {
+            metadataGroupInputContainer.className += ' requiredInput';
+            if(selectedValue == '{!SELENIUM_TEST}'){
+                SeleniumGroupInputContainer.className += ' requiredInput';
+            }
+        }
+    }
+    </script>
+</apex:page>
