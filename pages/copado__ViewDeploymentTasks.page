@@ -260,6 +260,17 @@
 												}
 											</script>
 										</apex:outputPanel>
+										<apex:outputPanel layout="none" rendered="{!copado__Deployment_Task__c.copado__Type__c == 'Data Template'}">
+											<c:DataTemplateTaskComponent isEdit="false"/>
+											<script type="text/javascript">
+												datasetup.setPreviousData = function(data){
+													if(data) {
+														data = JSON.parse(data);
+														$copado('[id$=jsDataTemplate_View]').val(data.dataTemplateName);
+													}
+												}
+											</script>
+										</apex:outputPanel>
 										<apex:outputPanel layout="none" rendered="{!copado__Deployment_Task__c.copado__Type__c == 'Bulk Data'}">
 											<c:DataComponent isEdit="false" prequery="" orgId="{!ustry.copado__Org_Credential__c}" stepType="Data"/>
 											<script type="text/javascript">

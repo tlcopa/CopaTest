@@ -17,7 +17,7 @@
         <c:IncludeStaticsResourceComponent addJQuery="true" />
     </head>
 
-    <body>
+    <body class="slds-scope">
     <apex:outputField value="{!copado__Org__c.Name}" rendered="false" /><!-- NR to avoid vf NS issues -->
     <apex:outputField value="{!copado__Org__c.copado__Environment__c}" rendered="false" /><!-- NR to avoid vf NS issues -->
     <apex:outputField value="{!copado__Org__c.Environment__r.Name}" rendered="false" /><!-- NR to avoid vf NS issues -->
@@ -27,7 +27,7 @@
         <apex:pageMessages id="theMessages" rendered="{!$User.UIThemeDisplayed != 'Theme4d'}" />
         <apex:sectionHeader id="sh_org" title="{!$ObjectType.copado__Org__c.Label} {!$Label.copado__edit}" subtitle="{!IF(ISBLANK(org.Name),'New Org',org.Name)}" description="{!$Label.copado__org_edit_description}" rendered="{!$User.UIThemeDisplayed != 'Theme4d'}" />
 
-        <apex:outputPanel layout="block" styleClass="slds-scope copado-lightning-container" rendered="{!$User.UIThemeDisplayed == 'Theme4d'}">
+        <apex:outputPanel layout="block" styleClass="copado-lightning-container" rendered="{!$User.UIThemeDisplayed == 'Theme4d'}">
             <div class="slds-page-header">
                 <apex:outputPanel layout="block" id="pageMessages">
                     <apex:pagemessages id="msg" />

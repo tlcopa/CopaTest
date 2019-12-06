@@ -162,8 +162,9 @@
                                                 {!temp.values.relationList.size} {!$Label.Related_Data_Templates}
                                             </div>
                                             <div class="slds-col slds-size_1-of-12 result-icons">
-                                                <img id="{!SUBSTITUTE(temp.values.dataTemplate.templateName,' ','')}_confirm" title="{!temp.values.dataTemplate.templateMainObject} {!$Label.Object_Is_Found}" class="confirm-images" src="{!URLFOR($Resource.DTS_images, 'check.png')}"/>
-                                                <img id="{!SUBSTITUTE(temp.values.dataTemplate.templateName,' ','')}_cross" title="{!temp.values.dataTemplate.templateMainObject} {!$Label.Object_Is_Not_Found}" class="cross-images" src="{!URLFOR($Resource.DTS_images, 'cross.png')}"/>
+                                                <img id="{!temp.values.dataTemplate.encodedTemplateName}_confirm" title="{!temp.values.dataTemplate.templateMainObject} {!$Label.Object_Is_Found}" class="confirm-images" src="{!URLFOR($Resource.DTS_images, 'check.png')}"/>
+                                                <img id="{!temp.values.dataTemplate.encodedTemplateName}_cross" title="{!temp.values.dataTemplate.templateMainObject} {!$Label.Object_Is_Not_Found}" class="cross-images" src="{!URLFOR($Resource.DTS_images, 'cross.png')}"/>
+                                                <img id="{!temp.values.dataTemplate.encodedTemplateName}_warning" title="{!temp.values.dataTemplate.templateName} {!$Label.Duplicate_Template_Name_Import}" class="warning-images" src="{!URLFOR($Resource.DTS_images, 'warning.png')}"/>
                                             </div>
                                         </div>
                                     </apex:repeat>
@@ -206,7 +207,7 @@
                     <footer class="slds-modal__footer">
                         <apex:outputPanel layout="block" styleClass="buttons modal-button" id="uploadTemplateFooter">
                             <button  id="doneButton" type="button" class="slds-button slds-button_brand hide-buttons" onclick="lockScreen();dti.orgCallout('{!OrgCalloutData}');">
-                                {!$Label.Done}
+                                {!$Label.Confirm_Import}
                             </button>
                             <button id="validateButton" type="button" class="slds-button slds-button_brand" onclick="lockScreen();checkValidationCondition();">
                                 {!$Label.Validate}

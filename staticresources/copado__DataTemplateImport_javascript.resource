@@ -321,7 +321,7 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
         var childRelationshipsResult = describeResult.childRelationships;
         var globalDescribe = JSON.parse(resultData.globalDescribe);
         var globalDescribeSobjects = globalDescribe.sobjects;
-        console.log('globalDescribeSobjects: ',globalDescribeSobjects);
+        console.log('globalDescribeSobjects: ', globalDescribeSobjects);
         var updatedDescribeFieldsResult = {};
         var updatedChildRelationshipResult = {};
         var currentField = {};
@@ -393,7 +393,6 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
         var innerChildRelationshipsList = [];
         var index = 0;
         // child object mapping
-        console.log('childRelationshipsResult: ',childRelationshipsResult);
         childRelationshipsResult.forEach((object) => {
             var isSelected = false;
             index = childObjetcsArray.findIndex((element) => {
@@ -410,33 +409,35 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
             });
 
             var objectLabel = {};
-            objectLabel[object.childSObject] = objectLabelName.label;
+            if (objectLabelName) {
+                objectLabel[object.childSObject] = objectLabelName.label;
 
-            var childObjects = {
-                isSelected: isSelected,
-                childSObject: object.childSObject,
-                field: object.field,
-                relationshipName: object.relationshipName,
-                objectApiNameMap: objectLabel,
-                deploymentTemplateNameMap: {},
-                deploymentTemplate: 'Select Template'
-            };
+                var childObjects = {
+                    isSelected: isSelected,
+                    childSObject: object.childSObject,
+                    field: object.field,
+                    relationshipName: object.relationshipName,
+                    objectApiNameMap: objectLabel,
+                    deploymentTemplateNameMap: {},
+                    deploymentTemplate: 'Select Template'
+                };
 
-            var childRelationKey = object.field + '-' + object.relationshipName;
+                var childRelationKey = object.field + '-' + object.relationshipName;
 
-            updatedChildRelationshipResult[childRelationKey] = childObjects;
+                updatedChildRelationshipResult[childRelationKey] = childObjects;
 
-            var childDescribeResult = {
-                childSObject: object.childSObject,
-                field: object.field,
-                relationshipName: object.relationshipName,
-            };
+                var childDescribeResult = {
+                    childSObject: object.childSObject,
+                    field: object.field,
+                    relationshipName: object.relationshipName,
+                };
 
-            innerChildRelationshipsList.push(childDescribeResult);
+                innerChildRelationshipsList.push(childDescribeResult);
 
-            if (innerChildRelationshipsList.length === 1000) {
-                childRelationshipsList.push(innerChildRelationshipsList);
-                innerChildRelationshipsList = [];
+                if (innerChildRelationshipsList.length === 1000) {
+                    childRelationshipsList.push(innerChildRelationshipsList);
+                    innerChildRelationshipsList = [];
+                }
             }
         });
         childRelationshipsList.push(innerChildRelationshipsList);
@@ -494,14 +495,14 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
     var createDataTemplateAttachmentBody = (attachmentBodyData) => {
         var mainDataTemplate = {
             templateSourceOrg: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Template_Source_Org__c'],
-            templateName: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Name'],
+            templateName: attachmentBodyData.templateDetails['Name'],
             templateMatchRecordTypes: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Match_Record_Type__c'],
             templateMainObject: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Main_Object__c'],
             templateMatchOwners: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Match_Owners__c'],
             templateId: attachmentBodyData.parentId,
             templateDescription: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Description__c'],
             templateContinueOnError: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Continue_on_Error__c'],
-            templateActive: activeTemplate && activeTemplate === 'true' ? true : false,
+            templateActive: activeTemplate,
             templateQueryLimit: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Max_Record_Limit__c'],
             templateBatchSize: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Batch_Size__c'],
             templateFilterLogic: attachmentBodyData.templateDetails[attachmentBodyData.namespace + 'Filter_Logic__c'],
@@ -596,80 +597,116 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
         dataTemplate[creationData.namespace + 'Match_Owners__c'] = creationData.importedObj.dataTemplate.templateMatchOwners;
         dataTemplate[creationData.namespace + 'Match_Record_Type__c'] = creationData.importedObj.dataTemplate.templateMatchRecordTypes;
         dataTemplate[creationData.namespace + 'Continue_on_Error__c'] = creationData.importedObj.dataTemplate.templateContinueOnError;
-        dataTemplate[creationData.namespace + 'Active__c'] = activeTemplate && activeTemplate === 'true' ? true : false;
-        dataTemplate[creationData.namespace + 'Name'] = creationData.importedObj.dataTemplate.templateName;
+        dataTemplate[creationData.namespace + 'Active__c'] = activeTemplate;
+        dataTemplate['Name'] = creationData.importedObj.dataTemplate.templateName;
 
-        var result = sforce.connection.create([dataTemplate]);
-        if (result[0].success) {
-            var dataId = result[0].id;
-            var attachmentData = {
-                parentId: dataId,
-                templateDetails: dataTemplate,
-                describeResult: creationData.describeResult,
-                globalDescribe: creationData.globalDescribe,
-                sourceOrgId: creationData.sourceOrgId,
-                importedObj: creationData.importedObj,
-                namespace: creationData.namespace
+        try {
+            var result = sforce.connection.create([dataTemplate]);
+            if (result[0].success) {
+                var dataId = result[0].id;
+                var attachmentData = {
+                    parentId: dataId,
+                    templateDetails: dataTemplate,
+                    describeResult: creationData.describeResult,
+                    globalDescribe: creationData.globalDescribe,
+                    sourceOrgId: creationData.sourceOrgId,
+                    importedObj: creationData.importedObj,
+                    namespace: creationData.namespace
+                }
+
+                var newTemplateDetails = {
+                    templateUUId: creationData.templateUUId,
+                    id: dataId,
+                    name: dataTemplate.Name
+                };
+                realDataTemplateIdMap.push(newTemplateDetails);
+                createAttachments(attachmentData, cbOnEnd);
             }
-
-            var newTemplateDetails = {
-                templateUUId: creationData.templateUUId,
-                id: dataId,
-                name: dataTemplate.Name
-            };
-            realDataTemplateIdMap.push(newTemplateDetails);
-            createAttachments(attachmentData, cbOnEnd);
+        } catch (error) {
+            var errorMessage = error.message ? error.message : error.faultstring ? error.faultstring : 'Unknown Error';
+            showError(errorMessage);
+            console.error(error);
         }
     };
 
 
     // it is used to make object callout to get describe result from selected org
     // on validation step, it will end at this function
-    var objectCallout = (dataObject,cbOnEnd) => {
+    var objectCallout = (dataObject, cbOnEnd) => {
         var cleanUrl = dataObject.endpoint.replace('copado_objName', dataObject.name);
-        sforce.connection.remoteFunction({
-            url: cleanUrl,
-            requestHeaders: {
-                'userId': dataObject.userId,
-                'orgId': dataObject.organizationId,
-                'token': dataObject.token
-            },
-            method: 'GET',
-            onSuccess: (response) => {
-                var res = JSON.parse(response);
-                if(!res.success) {
-                    if(res.error) {
-                        showError(res.error);
-                    } else {
-                        var imageId = dataObject.values.dataTemplate.templateName.replace(/\s/g, '') + '_cross';
-                        $copado(`#${imageId}`).removeClass('cross-images');
-                        app.totalNotValidatedTemplate++;
-                        cbOnEnd && cbOnEnd();
+        var duplicateNameDetected = false;
+
+        try {
+            sforce.connection.query('SELECT Id,Name FROM ' + dataObject.namespace + 'Data_Template__c WHERE ' + dataObject.namespace + 'Main_Object__c=\'' + dataObject.name + '\'', {
+                onSuccess: (response) => {
+                    if (response.records) {
+                        response.records.forEach((existingTemplateRecords) => {
+                            if(existingTemplateRecords.Name == dataObject.values.dataTemplate.templateName) {
+                                duplicateNameDetected = true;
+                            }
+                        });
                     }
-                } else {
-                    if (app.isValidated) {
-                        var creationData = {
-                            namespace: dataObject.namespace,
-                            sourceOrgId: dataObject.sourceOrgId,
-                            importedObj: dataObject.values,
-                            describeResult: response,
-                            globalDescribe: dataObject.globalDescribe,
-                            index: dataObject.index,
-                            templateUUId: dataObject.templateUUId
-                        };
-                        return createDataTemplate(creationData, cbOnEnd);
-                    } else {
-                        var imageId = dataObject.values.dataTemplate.templateName.replace(/\s/g, '') + '_confirm';
-                        $copado(`#${imageId}`).removeClass('confirm-images');
-                        app.totalValidatedTemplate++;
-                        cbOnEnd && cbOnEnd();
-                    }
+                },
+                onFailure: (error) => {
+                    showError(error);
                 }
-            },
-            onFailure: (error) => {
-                showError(error);
-            }
-        });
+            });
+
+            sforce.connection.remoteFunction({
+                url: cleanUrl,
+                requestHeaders: {
+                    'userId': dataObject.userId,
+                    'orgId': dataObject.organizationId,
+                    'token': dataObject.token
+                },
+                method: 'GET',
+                onSuccess: (response) => {
+                    var res = JSON.parse(response);
+                    if (!res.success) {
+                        if (res.error) {
+                            showError(res.error);
+                        } else {
+                            var imageId = dataObject.values.dataTemplate.templateName.replace(/[^a-zA-Z0-9]/g, '') + '_cross';
+                            $copado(`#${imageId}`).removeClass('cross-images');
+                            app.totalNotValidatedTemplate++;
+                            cbOnEnd && cbOnEnd();
+                        }
+                    } else {
+                        if (app.isValidated) {
+                            var creationData = {
+                                namespace: dataObject.namespace,
+                                sourceOrgId: dataObject.sourceOrgId,
+                                importedObj: dataObject.values,
+                                describeResult: response,
+                                globalDescribe: dataObject.globalDescribe,
+                                index: dataObject.index,
+                                templateUUId: dataObject.templateUUId
+                            };
+                            return createDataTemplate(creationData, cbOnEnd);
+                        } else {
+                            if(duplicateNameDetected) {
+                                var imageId = dataObject.values.dataTemplate.templateName.replace(/[^a-zA-Z0-9]/g, '') + '_warning';
+                                $copado(`#${imageId}`).removeClass('warning-images');
+                                app.totalNotValidatedTemplate++;
+                            } else {
+                                var imageId = dataObject.values.dataTemplate.templateName.replace(/[^a-zA-Z0-9]/g, '') + '_confirm';
+                                $copado(`#${imageId}`).removeClass('confirm-images');
+                                app.totalValidatedTemplate++;
+                            }
+                            cbOnEnd && cbOnEnd();
+                        }
+                    }
+                },
+                onFailure: (error) => {
+                    showError(error);
+                }
+            });
+        } catch (error) {
+            var errorMessage = error.message ? error.message : error.faultstring ? error.faultstring : 'Unknown Error';
+            showError(errorMessage);
+            console.error(error);
+        }
+
     };
 
 
@@ -702,7 +739,7 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
                 globalDescribe: existingDataObject.globalDescribe,
                 namespace: existingDataObject.namespace ? existingDataObject.namespace : ''
             };
-            objectCallout(dataObject,deferred.resolve);
+            objectCallout(dataObject, deferred.resolve);
         });
 
         //waits for every callout in the for loop to be done via deferred pattern and then calls the final actions
@@ -715,7 +752,7 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
                 $copado('#validateButton').addClass('hide-buttons');
                 app.isValidated = true;
                 unlockScreen();
-            } else if(importedTemplateCount !== app.totalValidatedTemplate && importedTemplateCount === (app.totalValidatedTemplate + app.totalNotValidatedTemplate) && !app.isValidated) {
+            } else if (importedTemplateCount !== app.totalValidatedTemplate && importedTemplateCount === (app.totalValidatedTemplate + app.totalNotValidatedTemplate) && !app.isValidated) {
                 unlockScreen();
             }
         });
@@ -725,17 +762,23 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
     // it is used to check if global describe result is already exists in selected org credential,
     // If it is exists, we will use the existing attachment and not do callout
     var retrieveGlobalDescribeAttachment = (orgId, cbOnEnd) => {
-        sforce.connection.query('SELECT Id,Name,Body FROM Attachment WHERE ParentId=\'' + orgId + '\' AND Name =\'ADD_Describe_Global_Result\' LIMIT 1', {
-            onSuccess: (response) => {
-                if (response.records) {
-                    existingGlobalDescribeResult = sforce.Base64Binary.prototype.decode(response.records.Body);
+        try {
+            sforce.connection.query('SELECT Id,Name,Body FROM Attachment WHERE ParentId=\'' + orgId + '\' AND Name =\'ADD_Describe_Global_Result\' LIMIT 1', {
+                onSuccess: (response) => {
+                    if (response.records) {
+                        existingGlobalDescribeResult = sforce.Base64Binary.prototype.decode(response.records.Body);
+                    }
+                    cbOnEnd && cbOnEnd();
+                },
+                onFailure: (error) => {
+                    showError(error);
                 }
-                cbOnEnd && cbOnEnd();
-            },
-            onFailure: (error) => {
-                showError(error);
-            }
-        });
+            });
+        } catch (error) {
+            var errorMessage = error.message ? error.message : error.faultstring ? error.faultstring : 'Unknown Error';
+            showError(errorMessage);
+            console.error(error);
+        }
     };
 
     // the main function that is called from visualforce page to start validation and done
@@ -764,27 +807,33 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
             };
 
             if (!existingGlobalDescribeResult) {
-                sforce.connection.remoteFunction({
-                    url: parsedData.orgCalloutEndpoint,
-                    requestHeaders: {
-                        'userId': parsedData.userId,
-                        'orgId': parsedData.organizationId,
-                        'token': parsedData.token
-                    },
-                    method: 'GET',
-                    onSuccess: (response) => {
-                        var res = JSON.parse(response);
-                        if(!res.success) {
-                            showError(res.error);
-                        } else {
-                            dataObject['globalDescribe'] = response;
-                            prepareObjectCallout(dataObject);
+                try {
+                    sforce.connection.remoteFunction({
+                        url: parsedData.orgCalloutEndpoint,
+                        requestHeaders: {
+                            'userId': parsedData.userId,
+                            'orgId': parsedData.organizationId,
+                            'token': parsedData.token
+                        },
+                        method: 'GET',
+                        onSuccess: (response) => {
+                            var res = JSON.parse(response);
+                            if (!res.success) {
+                                showError(res.error);
+                            } else {
+                                dataObject['globalDescribe'] = response;
+                                prepareObjectCallout(dataObject);
+                            }
+                        },
+                        onFailure: (error) => {
+                            showError(error);
                         }
-                    },
-                    onFailure: (error) => {
-                        showError(error);
-                    }
-                });
+                    });
+                } catch (error) {
+                    var errorMessage = error.message ? error.message : error.faultstring ? error.faultstring : 'Unknown Error';
+                    showError(errorMessage);
+                    console.error(error);
+                }
             } else {
                 dataObject['globalDescribe'] = existingGlobalDescribeResult;
                 prepareObjectCallout(dataObject);

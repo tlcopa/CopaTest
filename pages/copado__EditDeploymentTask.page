@@ -18,7 +18,20 @@
         <script src="{!URLFOR($Resource.metadataGrid2)}" />
 
         <style type="text/css">
-				.lookupInput a{
+
+                .lookupInput input {
+                     background-color: rgb(255, 255, 255);
+                    border: 1px solid rgb(221, 219, 218);
+                    border-radius: .25rem;
+                    width: 100%;
+                    transition: border .1s linear,background-color .1s linear;
+                    display: inline-block;
+                    padding: 0 1rem 0 .75rem;
+                    line-height: 1.875rem;
+                    min-height: calc(1.875rem + (1px * 2));
+                }
+
+				.lookupInput a {
                     position: absolute;
                     height:22px !important;
                     width: 33px !important;
@@ -112,7 +125,6 @@
 					var data = dataJson ? dataJson : false;
 					console.log('data==>',data);
 					if(datasetup.setPreviousData) datasetup.setPreviousData(data);
-					
 				}
 				
 				var saveTask = function(){
@@ -457,6 +469,26 @@
 												init(undefined,parsed);
 											}
 
+                                </script>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!copado__Deployment_Task__c.copado__Type__c == 'Data Template'}">
+                                <c:DataTemplateTaskComponent isEdit="true"/>
+                                <script type="text/javascript">
+                                    datasetup.save = function(){
+                                        var obj = {
+                                            dataTemplateId: $copado('[id$=auxDataTemplateId_lkid]').val(),
+                                            dataTemplateName: $copado('[id$=auxDataTemplateId]').val()
+                                        }
+                                        return JSON.stringify(obj);
+                                    }
+
+                                    datasetup.setPreviousData = function(data){
+                                        if(data) {
+                                            data = JSON.parse(data);
+											$copado('[id$=auxDataTemplateId_lkid]').val(data.dataTemplateId);
+											$copado('[id$=auxDataTemplateId]').val(data.dataTemplateName);
+                                        }
+                                    }
                                 </script>
                             </apex:outputPanel>
                             <apex:outputPanel layout="none" rendered="{!copado__Deployment_Task__c.copado__Type__c == 'Bulk Data'}">

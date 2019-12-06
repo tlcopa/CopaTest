@@ -61,27 +61,28 @@
             });
             renderQualityGatesforEnvironmentAcf(selectedSourceEnv);
         }
+
     </script>
     <apex:stylesheet value="{!$Resource.copado__DW_custom_css}" />
 
     <apex:form >
+
         <apex:actionFunction name="renderQualityGatesforEnvironmentAcf" action="{!calculateConnectionBehavior}" reRender="connectionBehaviorPanel" onComplete="isLastInit();unlockScreen();">
-            <apex:param name="environment" value=""/>
+            <apex:param name="environment" value="" />
         </apex:actionFunction>
         <c:CopadoErrorPanel pageMessagesMap="{!pageMessagesMap}" />
-        <c:ScreenLocker msg="{!$Label.copado__loading} Template" />
+        <c:CopadoSpinner />
         <div class="co-dw-container">
-
-            <!--<apex:outputPanel rendered="{!dependenciesList.size > 0}">
-                <p class="subtitle-warning">Potential Missing Dependencies</p>
-                <br/>
-                <c:UserStoryDependencies usList="{!dependenciesList}" tablecss="background-color: #ffd0d0;"/>
-                <br/>
-                <br/>
-            </apex:outputPanel>-->
             <div class="slds-grid">
                 <div class="slds-col slds-size_3-of-12"></div>
                 <div class="slds-col slds-size_6-of-12">
+                    <apex:outputPanel rendered="{!!hasApiKey}" layout="none">
+                        <center style="font-size: initial;">
+                            <apex:outputText value="{!$Label.copado__apikeynotset}"/>
+                            <apex:commandlink action="{!redirectToAccountSummary}" value="{!$Label.copado__clickhere}" target="_blank"/>
+                            &nbsp;<apex:outputText value="{!$Label.copado__tosetapikey}"/>
+                        </center>
+                    </apex:outputPanel>
                     <h1>
                         <apex:outputText value="{!currentUserStory.Name}"></apex:outputText>
                     </h1>
@@ -89,10 +90,11 @@
 
                     <div class="slds-col slds-size_1-of-1" style="text-align:center;">
                         <p>
-                            Your changes will be deployed from <b> {!currentUserStory.Environment__r.Name} </b> to <b>{!nextEnvironment}</b> environment
+                            Your changes will be deployed from <b> {!currentUserStory.Environment__r.Name} </b> to
+                            <b>{!nextEnvironment}</b> environment
                         </p>
-                        <br/>
-                        <br/>
+                        <br />
+                        <br />
                     </div>
 
 
@@ -117,108 +119,106 @@
                         </apex:outputPanel>
                     </apex:outputPanel>
 
-                    <apex:outputPanel id="connectionBehaviorPanel" >
-                    <div class="slds-grid slds-wrap" style="max-height:50%;">
+                    <apex:outputPanel id="connectionBehaviorPanel">
+                        <div class="slds-grid slds-wrap" style="max-height:50%;align-items: center;padding-left: 20%;">
 
-                        <div class="slds-col slds-size_1-of-2" style="margin-top:30px;">
-                            <div style="margin: 10px 20px 0px 0px; float:right;">
-                                <div class="slds-media__figure">
-                                    <apex:image value="{!URLFOR($Resource.copado__SetupDashboardIcons, 'PipelineSvgIcons/ccd-link.png')}" /> Dependencies
+                            <div class="slds-col slds-size_3-of-6" style="margin-top:30px;">
+                                <div style="margin: 10px 20px 0px 0px; float:left;">
+                                    <div class="slds-media__figure">
+                                        <apex:image value="{!URLFOR($Resource.copado__SetupDashboardIcons, 'PipelineSvgIcons/ccd-link.png')}" /> {!$Label.copado__usdependency_usdependenciestitle}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2" style="margin-top:30px;">
-                            <div class="slds-box_x-small slds-m-around_x-small slds-p-around_x-small">
-                                <ul style="float:left;margin: 0px 0px 0px 20px;">
-
+                            <div class="slds-col slds-size_3-of-6" style="margin-top:30px;">
+                                <div class="slds-box_x-small slds-m-around_x-small slds-p-around_x-small">
+                                    <ul style="float:left;margin: 0px 0px 0px 0px;">
                                         <li>
                                             <apex:outputPanel rendered="{!If(dependenciesList.size > 0, false, true)}" layout="none">
-                                                <span>No Dependencies</span>
+                                                <span>{!$Label.copado__no_dependencies}</span>
                                             </apex:outputPanel>
                                             <apex:outputPanel rendered="{!If(dependenciesList.size > 0, true, false)}" layout="none">
-                                                <a href="#" onclick="$copado('[id$=\'dependencyUSComponent\']').show();">({!TEXT(dependenciesList.size)}) Dependent User Stories</a>
+                                                <a href="#" onclick="$copado('[id$=\'dependencyUSComponent\']').show();">({!TEXT(dependenciesList.size)}) {!$Label.copado__dependent_user_stories}</a>
                                             </apex:outputPanel>
                                         </li>
-                                </ul>
-                                <br />
-                            </div>
-                        </div>
-
-                        <div class="slds-col slds-size_1-of-2" style="margin-top:30px;">
-                            <div style="margin: 10px 20px 0px 0px; float:right;">
-                                <div class="slds-media__figure">
-                                    <apex:image value="{!URLFOR($Resource.copado__SetupDashboardIcons, 'PipelineSvgIcons/pipeline-infinity.png')}" /> Deployment
+                                    </ul>
+                                    <br />
                                 </div>
                             </div>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2" style="margin-top:30px;">
-                            <div class="slds-box_x-small slds-m-around_x-small slds-p-around_x-small">
-                                <ul style="float:left;margin: 0px 0px 0px 20px;">
+
+                            <div class="slds-col slds-size_3-of-6">
+                                <div style="margin: 10px 20px 0px 0px; float:left;">
+                                    <div class="slds-media__figure">
+                                        <apex:image value="{!URLFOR($Resource.copado__SetupDashboardIcons, 'PipelineSvgIcons/pipeline-infinity.png')}" />
+                                        Deployment
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_3-of-6">
+                                <div class="slds-box_x-small slds-m-around_x-small slds-p-around_x-small">
+                                    <ul style="float:left;margin: 0px 0px 0px 0px;">
 
                                         <li>
-                                            {!connectionBehavior} <br/>
-                                             To {!nextEnvironment}
+                                            {!connectionBehavior} <br />
+                                            To {!nextEnvironment}
                                         </li>
-                                </ul>
-                                <br />
-                            </div>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2" style="margin-top:30px;margin-bottom:5%;">
-                            <div style="margin: 10px 20px 0px 0px; float:right;">
-                                <div class="slds-media__figure">
-                                    <apex:image value="{!URLFOR($Resource.copado__SetupDashboardIcons, 'PipelineSvgIcons/pipeline-shield.png')}" /> Quality Gate
+                                    </ul>
+                                    <br />
                                 </div>
                             </div>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2" style="margin-top:30px;margin-bottom:5%;">
-                            <div class="slds-box_x-small slds-m-around_x-small slds-p-around_x-small">
-                                <ul style="float:left;margin: 0px 0px 0px 20px;">
-                                    <apex:outputPanel rendered="{!IF(qualityGateList.size > 0, true, false)}">
-                                        <apex:repeat value="{!qualityGateList}" var="qa">
+                            <div class="slds-col slds-size_3-of-6" style="margin-bottom:5%;">
+                                <div style="margin: 10px 20px 0px 0px; float:left;">
+                                    <div class="slds-media__figure">
+                                        <apex:image value="{!URLFOR($Resource.copado__SetupDashboardIcons, 'PipelineSvgIcons/pipeline-shield.png')}" />
+                                        Quality Gate
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_3-of-6" style="margin-bottom:5%;">
+                                <div class="slds-box_x-small slds-m-around_x-small slds-p-around_x-small">
+                                    <ul style="float:left;margin: 0px 0px 0px 0px;">
+                                        <apex:outputPanel rendered="{!IF(qualityGateList.size > 0, true, false)}">
+                                            <apex:repeat value="{!qualityGateList}" var="qa">
+                                                <li>
+                                                    <apex:outputText value="{!qa.Name}" />
+                                                    <apex:outputText style="color:#9e9e9e;" value="  ({!qa.copado__Type__c})" />
+                                                </li>
+                                            </apex:repeat>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!IF(qualityGateList.size > 0, false, true)}">
                                             <li>
-                                                <apex:outputText value="{!qa.Name}" /> <apex:outputText style="color:#9e9e9e;" value="  ({!qa.copado__Type__c})" />
+                                                {!$Label.copado__no_quality_gates_will_be_created}
                                             </li>
-                                        </apex:repeat>
-                                    </apex:outputPanel>
-                                    <apex:outputPanel rendered="{!IF(qualityGateList.size > 0, false, true)}">
-                                        <li>
-                                            No Quality gates will be created based on current User Story!
-                                        </li>
-                                    </apex:outputPanel>
-                                </ul>
-                                <br />
+                                        </apex:outputPanel>
+                                    </ul>
+                                    <br />
+                                </div>
                             </div>
-                        </div>
 
 
-
-                        <div class="slds-col slds-size_1-of-1" style="text-align:center;">
-                            <div class="buttons slds-m-top--xx-large">
-                                <apex:commandButton styleClass="slds-button slds-button_outline-brand" value="Back to User Story" action="{!goBackToUserStory}" />
-                                <apex:commandButton styleClass="slds-button slds-button_brand" value="Submit Changes" action="{!submitChanges}" />
+                            <div class="slds-col slds-size_4-of-6" style="text-align:center;">
+                                <div class="buttons slds-m-top--xx-large">
+                                    <apex:commandButton styleClass="slds-button slds-button_outline-brand" value="Back to User Story" action="{!goBackToUserStory}" />
+                                    <apex:commandButton styleClass="slds-button slds-button_brand" value="Submit Changes" action="{!submitChanges}" />
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
-                        </apex:outputPanel>
+                        </div>
+                    </apex:outputPanel>
                 </div>
                 <div class="slds-col slds-size_3-of-12"></div>
             </div>
         </div>
-        <apex:outputPanel layout="block" id="dependencyUSComponent" style="display: none;"
-                          styleClass="slds-scope">
+        <apex:outputPanel layout="block" id="dependencyUSComponent" style="display: none;" styleClass="slds-scope">
             <div class="slds-modal_large">
-                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
-                         aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                     <div class="slds-modal__container">
                         <header class="slds-modal__header">
                             <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
                                     title="Close" onclick="closeUSDep(); return false;">
                                 <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"
-                                         xlink:href="{!URLFOR($Resource.SLDS,'/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"  xlink:href="{!URLFOR($Resource.SLDS,'/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
                                 </svg>
-                                <span class="slds-assistive-text">Close</span>
+                                <span class="slds-assistive-text">{!$Label.CLOSE}</span>
                             </button>
                             <h2 id="modal-heading-01"
                                 class="slds-text-heading_medium slds-hyphenate">{!$label.USDependency_USDependenciesTitle}</h2>

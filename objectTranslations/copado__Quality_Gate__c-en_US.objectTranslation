@@ -11,6 +11,11 @@
         <relationshipLabel><!-- Quality Gates --></relationshipLabel>
     </fields>
     <fields>
+        <help><!-- If &apos;URL Callout&apos; is selected as the type, this stores the details of that callout. --></help>
+        <label><!-- DataJSON --></label>
+        <name>copado__DataJSON__c</name>
+    </fields>
+    <fields>
         <label><!-- Manual Task Owner --></label>
         <name>copado__Manual_Task_Owner__c</name>
         <relationshipLabel><!-- Quality Gates --></relationshipLabel>

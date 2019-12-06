@@ -244,7 +244,7 @@
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Description</label>
-        <length>131072</length>
+        <length>256</length>
         <trackTrending>false</trackTrending>
         <type>LongTextArea</type>
         <visibleLines>3</visibleLines>
@@ -273,7 +273,7 @@
     </fields>
     <fields>
         <fullName>copado__Match_Owners__c</fullName>
-        <defaultValue>true</defaultValue>
+        <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Match Owners</label>
@@ -282,7 +282,7 @@
     </fields>
     <fields>
         <fullName>copado__Match_Record_Type__c</fullName>
-        <defaultValue>true</defaultValue>
+        <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>Match Record Type</label>

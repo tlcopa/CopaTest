@@ -255,7 +255,7 @@
                             </p>
                             <div class="success-image">
                                 <div class="slds-media__figure">
-                                    <apex:image value="{!URLFOR($Resource.copado__DW_images,'icon_success.png')}" />
+                                    <apex:image styleClass="deployment-img" value="{!URLFOR($Resource.copado__DW_images,'icon_success.png')}" />
                                 </div>
                             </div>
                             <div class="buttons slds-m-top--xx-large">
@@ -282,7 +282,7 @@
                             </p>
                             <div class="error-image">
                                 <div class="slds-media__figure">
-                                    <apex:image value="{!URLFOR($Resource.copado__DW_images,'icon_error.png')}" />
+                                    <apex:image styleClass="deployment-img" value="{!URLFOR($Resource.copado__DW_images,'icon_error.png')}" />
                                 </div>
                             </div>
 
@@ -312,8 +312,5 @@
         </apex:outputPanel>
 
     </apex:form>
-
-
-
 
 </apex:page>

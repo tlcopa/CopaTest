@@ -652,6 +652,11 @@
                     $copado('.messageText h4').css('color','white');
                     $copado('.messageTable ul').css('color','white');
 
+                    //***UCU : unlockScreen when a page message returns from apex side pageReference method
+                    if($copado('div.message.customMessage').length > 0){
+                        unlockScreen();
+                    }
+
                     if(cb) cb();
                 }
 

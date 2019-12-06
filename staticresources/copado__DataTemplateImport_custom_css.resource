@@ -325,6 +325,7 @@ body {
 }
 
 .co-dti-container .confirm-images,
+.co-dti-container .warning-images,
 .co-dti-container .cross-images {
     display: none;
 }
@@ -366,7 +367,7 @@ body {
 
 #modalUploadTemplate .slds-card__body .templates-list {
     margin-bottom: 20px;
-    height: 160px;
+    max-height: 160px;
     overflow-x: hidden;
     overflow-y: scroll;
 }
@@ -406,4 +407,8 @@ body {
 
 #modalUploadTemplate .slds-card .slds-grid .icon span {
     padding: 4px;
+}
+
+#modalUploadTemplate .lookupInput {
+    width: 50%;
 }

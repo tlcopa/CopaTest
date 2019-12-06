@@ -230,17 +230,11 @@
 
     <apex:form >
         <!-- deployment modal functions -->
-        <!--<apex:actionFunction name="cancelThisDeployment" reRender="copadoErrorPanel,notify" action="{!cancelDeployment}">
-            <apex:param name="depId" value="" />
-        </apex:actionFunction>
-        <apex:actionFunction name="runThisDeployment" reRender="copadoErrorPanel,notify" action="{!runDeployment}" onComplete="rerenderDeploymentDatatable();">
-            <apex:param name="depId" value="" />
-        </apex:actionFunction>
-        <apex:actionFunction name="openConflictPage" reRender="copadoErrorPanel,notify" action="{!openResolveConflictsPage}" onComplete="rerenderDeploymentDatatable();">
+        <apex:actionFunction name="openConflictPage" reRender="copadoErrorPanel,copadoErrorPanelForDialog" action="{!openResolveConflictsPage}" onComplete="closeDeploymentModal();">
             <apex:param name="promId" value="" />
-        </apex:actionFunction>-->
+        </apex:actionFunction>
         <!-- Promotion / Back Promotion Panel -->
-        <apex:actionFunction name="promotionInfo" action="{!promotionInfo}" reRender="notify" />
+        <apex:actionFunction name="promotionInfo" action="{!promotionInfo}" reRender="copadoErrorPanelForDialog" />
         <apex:actionFunction name="switchToSelenium" action="{!showSeleniumResultsTab}" onComplete="renderTable4Selenium();unlockScreen();" reRender="fieldSets,GeneralActionButtons" />
         <apex:actionFunction name="switchToCompliance" action="{!showComplianceResultsTab}" onComplete="renderTable4Compliance();unlockScreen();" reRender="fieldSets,GeneralActionButtons" />
         <apex:actionFunction name="switchToUserStory" action="{!showUserStoriesTab}" onComplete="renderTable();unlockScreen();" reRender="fieldSets,GeneralActionButtons" />
@@ -252,11 +246,14 @@
         </apex:actionFunction>
         <apex:actionFunction name="renderPromotionPoller" reRender="rebasePromotionPoller" />
         <apex:actionFunction name="resetPromotionList" action="{!resetPromotionList}" oncomplete="renderTable();closePromotionListModal();changeSelectAll('userStoriesTable', 'selectAll');unlockScreen();" reRender="fieldSets,pins" />
-        <apex:actionFunction name="deployPromotionList" action="{!deployPromotionList}" reRender="createdPromotionListPanel,rebasePromotionPoller,notify" oncomplete="unlockScreen();" />
+        <apex:actionFunction name="deployPromotionList" action="{!deployPromotionList}" reRender="createdPromotionListPanel,rebasePromotionPoller,copadoErrorPanelForDialog" oncomplete="unlockScreen();" />
         <apex:outputPanel id="operationModal">
             <section role="dialog" tabindex="-1" id="modal" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_large" style="height: 100%">
                 <div class="slds-modal__container" style="width: 100% !important;">
                     <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="min-height: 85%; height: 100%; overflow-x:scroll;">
+                        <apex:outputPanel id="copadoErrorPanelForDialog" layout="none">
+                            <c:CopadoErrorPanel pageMessagesMap="{!pageMessagesMap}" />
+                        </apex:outputPanel>
                         <div class="slds-grid slds-wrap slds-clearfix">
                             <div id="modalHeader" class="slds-col slds-size_1-of-2">
                                 <button class="slds-button" onclick="closeToastMessage(); closeModal(); return false;">
@@ -267,9 +264,9 @@
                                 </button>
                             </div>
                             <apex:outputPanel id="GeneralActionButtons" styleClass="slds-col slds-size_1-of-2" style="text-align:right;">
-                                <apex:commandButton value="{!$Label.copado__pipeline_validate_selections}" styleClass="slds-button slds-button_neutral slds-m-horizontal_small" id="validateSelections" action="{!createPromotionforValidation}" reRender="maodalHeader, notify, createdPromotionListPanel" onClick="lockScreen();" oncomplete="openPromotionListModal();renderPromotionPoller();" disabled="{!NOT(showUserStories)}" />
-                                <apex:commandButton value="{!IF(newOverlay.pathType == 'merge', $Label.copado__pipeline_promote, $Label.copado__pipeline_back_promote)}" styleClass="slds-button slds-button_neutral slds-m-horizontal_small" id="createPromotion" action="{!createPromotion}" reRender="maodalHeader, notify,createdPromotionListButtons, createdPromotionListPanel" onClick="lockScreen();" onComplete="openPromotionListModal();" disabled="{!NOT(showUserStories)}" />
-                                <apex:commandButton value="{!IF(newOverlay.pathType == 'merge', $Label.copado__pipeline_promote_and_deploy, $Label.copado__pipeline_back_promote_and_deploy)}" styleClass="slds-button slds-button_brand slds-m-horizontal_small" id="createPromotionAndDeploy" action="{!createPromotionListAndDeploy}" reRender="maodalHeader, notify, createdPromotionListPanel,rebasePromotionPoller" onClick="lockScreen();" onComplete="openPromotionListModal(); unlockScreen();" disabled="{!NOT(showUserStories)}" />
+                                <apex:commandButton value="{!$Label.copado__pipeline_validate_selections}" styleClass="slds-button slds-button_neutral slds-m-horizontal_small" id="validateSelections" action="{!createPromotionforValidation}" reRender="maodalHeader, copadoErrorPanelForDialog, createdPromotionListPanel" onClick="lockScreen();" oncomplete="openPromotionListModal();renderPromotionPoller();" disabled="{!NOT(showUserStories)}" />
+                                <apex:commandButton value="{!IF(newOverlay.pathType == 'merge', $Label.copado__pipeline_promote, $Label.copado__pipeline_back_promote)}" styleClass="slds-button slds-button_neutral slds-m-horizontal_small" id="createPromotion" action="{!createPromotion}" reRender="maodalHeader, copadoErrorPanelForDialog,createdPromotionListButtons, createdPromotionListPanel" onClick="lockScreen();" onComplete="openPromotionListModal();" disabled="{!NOT(showUserStories)}" />
+                                <apex:commandButton value="{!IF(newOverlay.pathType == 'merge', $Label.copado__pipeline_promote_and_deploy, $Label.copado__pipeline_back_promote_and_deploy)}" styleClass="slds-button slds-button_brand slds-m-horizontal_small" id="createPromotionAndDeploy" action="{!createPromotionListAndDeploy}" reRender="maodalHeader, copadoErrorPanelForDialog, createdPromotionListPanel,rebasePromotionPoller" onClick="lockScreen();" onComplete="openPromotionListModal(); unlockScreen();" disabled="{!NOT(showUserStories)}" />
                             </apex:outputPanel>
 
                         </div>
@@ -576,7 +573,7 @@
                                     {!$Label.copado__pipeline_back_to_pipeline}
                                 </button>
                                 <h2 class="slds-text-heading_medium slds-hyphenate">
-                                    {!$Label.copado__deployment}
+                                    {!$Label.copado__deployment_activity}
                                 </h2>
                             </div>
                             <apex:outputPanel id="deploymentRenderPanel" layout="block" style="margin-top:20px">
@@ -590,11 +587,11 @@
                                                 </h2>
                                             </td>
                                         </apex:repeat>
-                                        <!--<td style="background-color: #fafaf9">
+                                        <td style="background-color: #fafaf9">
                                             <h2 id="deploymentHT" class="slds-text-title_caps slds-hyphenate" style="padding-left:20px">
                                                 {!$Label.Action}
                                             </h2>
-                                        </td>-->
+                                        </td>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -611,24 +608,12 @@
                                                     <apex:image url="{!deployment[dep]}" rendered="{!dep.Label == $ObjectType.copado__Deployment__c.fields.copado__Flag_Status__c.Label}" height="20" width="20"/>
                                                 </td>
                                             </apex:repeat>
-                                            <!--<td style="padding-left:28px">
-                                                <apex:outputPanel layout="none" rendered="{!deployment.Status__c == 'In progress'}">
-                                                    <button type="button" class="slds-button" onclick="cancelThisDeployment('{!deployment.Id}');copadoNavigateToUrl('{!deployment.Id}','{!URLFOR($Action.Deployment__c.View,deployment.Id)}', '_blank'); return false;" style="border: none;">{!$Label.CANCEL}
-                                                    </button>
+                                            <td style="padding-left:28px">
+                                                <apex:outputPanel layout="none" rendered="{!deployment.Promotion__r.copado__Status__c == 'Merge Conflict'}">
+                                                    <a href="javascript:void(0)" target="_blank" class="slds-button" onclick="openConflictPage('{!deployment.Promotion__c}');return false;" style="border: none;">{!$Label.MERGE_CONFLICT_REVIEW}
+                                                    </a>
                                                 </apex:outputPanel>
-                                                <apex:outputPanel layout="none" rendered="{!CONTAINS(deployment.Status__c, 'Completed')}">
-                                                    <button type="button" class="slds-button" onclick="runThisDeployment('{!deployment.Id}');copadoNavigateToUrl('{!deployment.Id}','{!URLFOR($Action.Deployment__c.View,deployment.Id)}', '_blank'); return false;" style="border: none;">Re-deploy
-                                                    </button>
-                                                </apex:outputPanel>
-                                                <apex:outputPanel layout="none" rendered="{!deployment.Status__c == 'Scheduled'}">
-                                                    <button type="button" class="slds-button" onclick="runThisDeployment('{!deployment.Id}');copadoNavigateToUrl('{!deployment.Id}','{!URLFOR($Action.Deployment__c.View,deployment.Id)}', '_blank'); return false;" style="border: none;">{!$Label.DEPLOY}
-                                                    </button>
-                                                </apex:outputPanel>
-                                                <apex:outputPanel layout="none" rendered="{!deployment.Status__c == 'Merge Conflict'}">
-                                                    <button type="button" class="slds-button" onclick="openConflictPage('{!deployment.Promotion__c}');" style="border: none;">{!$Label.MERGE_CONFLICT_REVIEW}
-                                                    </button>
-                                                </apex:outputPanel>
-                                            </td>-->
+                                            </td>
 
                                         </tr>
                                     </apex:repeat>
@@ -636,8 +621,7 @@
                                 </table>
                                 <script>
                                     function rerenderDeploymentDatatable() {
-                                        console.log('creating data table');
-                                        $copado('#dt4Deployment').DataTable();
+                                        $copado('#dt4Deployment').DataTable({"order": []});
                                     }
 
                                 </script>

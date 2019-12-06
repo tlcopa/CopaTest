@@ -312,7 +312,7 @@
 
                             <apex:pageBlockSection id="pbsPbStatus" columns="1">
                                 <apex:outputField id="ofStatus" value="{!dep.copado__Status__c}">
-                                    <span class="orgIcon"><apex:image styleClass="js-status-icon" value="{!HTMLENCODE(dep.copado__Flag_Status__c)}" /></span>
+                                    <span class="orgIcon"><apex:image styleClass="js-status-icon" value="{!HTMLENCODE(dep.copado__Flag_Status__c)}" style="width:20px; height:auto;"/></span>
                                 </apex:outputField>
                                 <apex:outputField id="ofDate" value="{!dep.copado__Date__c}" />
                                 <apex:outputField id="ofCompleted" value="{!dep.copado__Completed__c}" />

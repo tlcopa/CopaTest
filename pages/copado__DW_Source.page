@@ -60,7 +60,10 @@
                         </apex:outputPanel>
 
                         <div class="slds-form-element">
-                            <label class="slds-form-element__label" for="deploymentName">{!$Label.copado__give_your_deployment_a_name}</label>
+                            <label class="slds-form-element__label" for="deploymentName">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                {!$Label.copado__give_your_deployment_a_name}
+                            </label>
                             <div class="slds-form-element__control">
                                 <apex:inputField id="deploymentName" value="{!deployment.Name}" styleClass="slds-input" html-placeholder="{!$Label.copado__your_deployment_name}" />
                             </div>

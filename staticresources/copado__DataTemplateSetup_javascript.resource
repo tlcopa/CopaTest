@@ -163,14 +163,22 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
         var rows, activePaginationSelected, table;
         var info = {};
         var currentPage = 0;
+        var searchInput = $copado(`#${tableId}_wrapper #${tableId}_filter`).find('input');
+        var sortOrderArray = [];
+        var searchValue = searchInput.val();
 
         activePaginationSelected = $copado(`#${tableId}_length`).find('select').val();
 
         var table = $copado(`#${tableId}`).DataTable();
+        // dataTable is the oldschool dataTables constructur, which returns a jQuery object. This jQuery object is enriched with a set of API methods in hungarian notation format, such as fnFilter, fnDeleteRow and so on.
+        sortOrderArray = $copado(`#${tableId}`).dataTable().fnSettings().aaSorting;
         var tableData = {
             paginationSize: activePaginationSelected,
-            currentPage: table.page.info().page
+            currentPage: table.page.info().page,
+            searchValue: searchValue,
+            sortOrderArray: sortOrderArray
         };
+        table.search( '' ).draw();
         $copado(`#${tableId}_length`).find('select').val(-1).trigger('change');
         tableIdPaginationObject[tableId] = tableData;
     };
@@ -183,8 +191,13 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
 
     app.contractDataTable = (tableId) => {
         var table = $copado(`#${tableId}`).DataTable();
+        var searchInput = $copado(`#${tableId}_wrapper #${tableId}_filter`).find('input');
+
         $copado(`#${tableId}_length`).find('select').val(tableIdPaginationObject[tableId].paginationSize).trigger('change');
-        table.page(tableIdPaginationObject[tableId].currentPage).draw(false);
+        // dataTable is the oldschool dataTables constructur, which returns a jQuery object. This jQuery object is enriched with a set of API methods in hungarian notation format, such as fnFilter, fnDeleteRow and so on.
+        $copado(`#${tableId}`).dataTable().fnSort( tableIdPaginationObject[tableId].sortOrderArray );
+
+        table.page(tableIdPaginationObject[tableId].currentPage).search( tableIdPaginationObject[tableId].searchValue ).draw(false);
     };
 
     app.contractDataTables = () => {
@@ -263,8 +276,10 @@ var globalSldsResourcePath = globalSldsResourcePath ? globalSldsResourcePath : u
         var table = $copado(`#${tableId}`);
         var lst = $copado('.slds-checkbox.row-select', table);
         var count = 0;
-        lst.each(function() {
-            if($copado(this).prop('checked') == true) count++ ;
+        lst.each( function() {
+            if ($copado(this).prop('checked') === true) {
+                count++ ;
+            }
         });
         var checkedBool = lst.length === count;
         $copado(`#${elemId}`).prop('checked', checkedBool);
